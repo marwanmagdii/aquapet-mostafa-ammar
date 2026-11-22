@@ -414,7 +414,7 @@ class ProfileScreen extends ConsumerWidget {
                           await ref.read(remindersProvider.notifier).load();
                           await ref.read(tanksProvider.notifier).load();
                           await ref.read(cartProvider.notifier).load();
-                          if (context.mounted) context.go('/');
+                          if (context.mounted) context.go('/splash');
                         },
                       ),
                     ],
