@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/tokens/app_tokens.dart';
@@ -76,6 +78,10 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
             ),
+
+            // App & Website QR Codes
+            const SizedBox(height: AppSpacing.md),
+            _ShareQrCard(isAr: isAr),
 
             const SizedBox(height: AppSpacing.md),
             AppCard(
@@ -391,6 +397,24 @@ class ProfileScreen extends ConsumerWidget {
                           await ref.read(remindersProvider.notifier).load();
                           await ref.read(tanksProvider.notifier).load();
                           await ref.read(cartProvider.notifier).load();
+                        },
+                      ),
+                      ActionChip(
+                        avatar: Icon(PhosphorIcons.sparkle(), size: 16),
+                        label: Text(
+                          isAr ? 'البدء كأول مرة' : 'Start as First Time',
+                        ),
+                        onPressed: () async {
+                          await ref.read(localStorageProvider).clearAll();
+                          await ref.read(simulatedDaysProvider.notifier).reset();
+                          await ref.read(userProvider.notifier).load();
+                          await ref.read(loyaltyProvider.notifier).load();
+                          await ref.read(couponsProvider.notifier).load();
+                          await ref.read(ordersProvider.notifier).load();
+                          await ref.read(remindersProvider.notifier).load();
+                          await ref.read(tanksProvider.notifier).load();
+                          await ref.read(cartProvider.notifier).load();
+                          if (context.mounted) context.go('/');
                         },
                       ),
                     ],
@@ -712,6 +736,237 @@ class _ProfileIconBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadii.md),
       ),
       child: Icon(icon, size: 20, color: color),
+    );
+  }
+}
+
+class _ShareQrCard extends StatelessWidget {
+  const _ShareQrCard({required this.isAr});
+
+  final bool isAr;
+
+  static const _mobileUrl = 'https://aquapet-flutter-mobile.vercel.app';
+  static const _websiteUrl = 'https://aquapet-mostafa-ammar.vercel.app';
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _ProfileIconBadge(
+                icon: PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
+                color: colors.primary,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isAr ? 'مشاركة التطبيق والموقع (QR)' : 'App & Website QR',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    Text(
+                      isAr
+                          ? 'اضغط لتكبير الباركود أو نسخ الرابط'
+                          : 'Tap to enlarge or copy link',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.mutedForeground,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _QrTile(
+                  title: isAr ? 'تطبيق الموبايل' : 'Mobile App',
+                  url: _mobileUrl,
+                  icon: PhosphorIcons.deviceMobile(PhosphorIconsStyle.duotone),
+                  accent: colors.primary,
+                  isAr: isAr,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: _QrTile(
+                  title: isAr ? 'الموقع الإلكتروني' : 'Website',
+                  url: _websiteUrl,
+                  icon: PhosphorIcons.globe(PhosphorIconsStyle.duotone),
+                  accent: const Color(0xFF0284C7),
+                  isAr: isAr,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QrTile extends StatelessWidget {
+  const _QrTile({
+    required this.title,
+    required this.url,
+    required this.icon,
+    required this.accent,
+    required this.isAr,
+  });
+
+  final String title;
+  final String url;
+  final IconData icon;
+  final Color accent;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Material(
+      color: colors.muted.withOpacity(0.65),
+      borderRadius: BorderRadius.circular(AppRadii.lg),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: () => _openPreview(context),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.lg),
+            border: Border.all(color: colors.border),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                child: QrImageView(
+                  data: url,
+                  version: QrVersions.auto,
+                  size: 86,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 15, color: accent),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openPreview(BuildContext context) {
+    final colors = context.appColors;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.xl),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppRadii.lg),
+                  border: Border.all(color: colors.border),
+                ),
+                child: QrImageView(
+                  data: url,
+                  version: QrVersions.auto,
+                  size: 210,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              SelectableText(
+                url,
+                textAlign: TextAlign.center,
+                style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                      color: colors.mutedForeground,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppSecondaryButton(
+                      icon: PhosphorIcons.copy(),
+                      label: isAr ? 'نسخ' : 'Copy',
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: url));
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isAr ? 'تم نسخ الرابط' : 'Link copied',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: AppPrimaryButton(
+                      icon: PhosphorIcons.arrowSquareOut(),
+                      label: isAr ? 'فتح' : 'Open',
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
