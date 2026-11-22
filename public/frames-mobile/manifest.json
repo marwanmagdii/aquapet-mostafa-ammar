@@ -1,0 +1,10 @@
+{
+  "count": 96,
+  "width": 800,
+  "height": 450,
+  "quality": 70,
+  "totalBytes": 3698600,
+  "totalMB": 3.53,
+  "basePath": "/frames-mobile",
+  "pattern": "frame_{index}.webp"
+}

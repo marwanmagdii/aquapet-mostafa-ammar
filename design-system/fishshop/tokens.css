@@ -1,0 +1,66 @@
+/* Design Tokens - Scene-Sampled Ocean Palette (Three-Layer Architecture) */
+
+/* === 1. PRIMITIVES === */
+:root {
+  --ocean-sunlit-cyan: #bfe9da;
+  --ocean-sky-cyan: #46b8da;
+  --ocean-mid-cyan: #5ecae2;
+  --ocean-center-cyan: #45acd4;
+  --ocean-deep-blue: #378fc8;
+  --ocean-royal-blue: #2a6ca5;
+  --ocean-royal-scrim: #1b5183;
+  --ocean-sand-yellow: #e8c580;
+  --ocean-plant-green: #66a470;
+  --ocean-cta-yellow: #facc15;
+  --ocean-cta-yellow-hover: #eab308;
+  --ocean-cta-yellow-soft: #fef9c3;
+  --ocean-whatsapp-green: #15803d;
+  --ocean-whatsapp-green-hover: #166534;
+  --ocean-navy-ink: #071a2f;
+  --ocean-slate-ink: #334155;
+  --ocean-muted-ink: #475569;
+  --ocean-surface-ice: #f0f9ff;
+  --ocean-surface-white: #ffffff;
+  --ocean-surface-muted: #e0f2fe;
+  --ocean-border-light: #bae6fd;
+}
+
+/* === 2. SEMANTIC === */
+:root {
+  --color-primary: var(--ocean-royal-blue);
+  --color-primary-hover: var(--ocean-royal-scrim);
+  --color-on-primary: #ffffff;
+  --color-secondary: var(--ocean-mid-cyan);
+  --color-on-secondary: var(--ocean-navy-ink);
+  --color-accent: var(--ocean-cta-yellow);
+  --color-accent-hover: var(--ocean-cta-yellow-hover);
+  --color-accent-soft: var(--ocean-cta-yellow-soft);
+  --color-on-accent: var(--ocean-navy-ink);
+  --color-whatsapp: var(--ocean-whatsapp-green);
+  --color-whatsapp-hover: var(--ocean-whatsapp-green-hover);
+  --color-on-whatsapp: #ffffff;
+  --color-plant: var(--ocean-plant-green);
+  --color-sand: var(--ocean-sand-yellow);
+  --color-background: var(--ocean-surface-ice);
+  --color-foreground: var(--ocean-navy-ink);
+  --color-card: var(--ocean-surface-white);
+  --color-card-foreground: var(--ocean-navy-ink);
+  --color-muted: var(--ocean-surface-muted);
+  --color-muted-foreground: var(--ocean-slate-ink);
+  --color-subtle-foreground: var(--ocean-muted-ink);
+  --color-border: var(--ocean-border-light);
+  --color-ring: var(--ocean-deep-blue);
+}
+
+/* === 3. COMPONENT === */
+:root {
+  --surface-hero-bg: var(--ocean-deep-blue);
+  --surface-hero-glass: rgba(27, 81, 131, 0.78);
+  --border-hero-glass: rgba(191, 233, 218, 0.42);
+  --surface-header-scrolled: rgba(240, 249, 255, 0.94);
+  --border-header-scrolled: rgba(55, 143, 200, 0.25);
+  --cta-bg: var(--ocean-cta-yellow);
+  --cta-bg-hover: var(--ocean-cta-yellow-hover);
+  --cta-fg: var(--ocean-navy-ink);
+  --motion-ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
+}

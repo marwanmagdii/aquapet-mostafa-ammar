@@ -1,0 +1,20 @@
+{
+  "count": 192,
+  "width": 1280,
+  "height": 720,
+  "quality": 82,
+  "totalBytes": 17445992,
+  "totalMB": 16.64,
+  "basePath": "/frames",
+  "pattern": "frame_{index}.webp",
+  "mobile": {
+    "count": 96,
+    "width": 800,
+    "height": 450,
+    "quality": 70,
+    "totalBytes": 3698600,
+    "totalMB": 3.53,
+    "basePath": "/frames-mobile",
+    "pattern": "frame_{index}.webp"
+  }
+}

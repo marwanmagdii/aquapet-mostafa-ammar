@@ -1,0 +1,51 @@
+@import "tailwindcss";
+@import "../design-system/fishshop/tokens.css";
+
+@theme inline {
+  --font-sans: var(--font-cairo), var(--font-jakarta), system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), system-ui, sans-serif;
+  --font-latin: var(--font-jakarta), system-ui, sans-serif;
+  --color-ocean-primary: var(--color-primary);
+  --color-ocean-primary-hover: var(--color-primary-hover);
+  --color-ocean-deep: var(--ocean-deep-blue);
+  --color-ocean-mid: var(--ocean-center-cyan);
+  --color-ocean-cyan: var(--color-secondary);
+  --color-ocean-sunlit: var(--ocean-sunlit-cyan);
+  --color-ocean-plant: var(--ocean-plant-green);
+  --color-ocean-sand: var(--ocean-sand-yellow);
+  --color-ocean-yellow: var(--color-accent);
+  --color-ocean-yellow-hover: var(--color-accent-hover);
+  --color-ocean-yellow-soft: var(--color-accent-soft);
+  --color-ocean-whatsapp: var(--color-whatsapp);
+  --color-ocean-whatsapp-hover: var(--color-whatsapp-hover);
+  --color-ocean-navy: var(--color-foreground);
+  --color-ocean-slate: var(--color-muted-foreground);
+  --color-ocean-ice: var(--color-background);
+  --color-ocean-muted: var(--color-muted);
+  --color-ocean-border: var(--color-border);
+}
+
+html,
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  overflow-x: clip;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
