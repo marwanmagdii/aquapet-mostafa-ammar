@@ -13,7 +13,7 @@ export function MobileActionBar() {
   return (
     <>
       <div
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-ocean-ice/95 backdrop-blur-lg border-t border-ocean-border px-4 py-2.5 flex items-center gap-3 shadow-[0_-8px_24px_rgba(42,108,165,0.12)]"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-ocean-ice border-t border-ocean-border px-4 py-2.5 flex items-center gap-3 shadow-[0_-6px_20px_rgba(42,108,165,0.1)]"
         role="region"
         aria-label={locale === "ar" ? "شريط التسوق السريع" : "Quick shopping bar"}
       >

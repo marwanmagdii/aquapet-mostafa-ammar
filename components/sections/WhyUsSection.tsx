@@ -43,17 +43,17 @@ export function WhyUsSection() {
           </div>
         </SectionReveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {t.whyUs.items.map((item, idx) => {
             const Icon = tileIcons[idx % tileIcons.length];
             return (
               <SectionReveal key={item.title} delayMs={idx * 60}>
-                <div className="h-full rounded-[1.75rem] bg-white/10 backdrop-blur-md p-6 border border-ocean-sunlit/25 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [@media(hover:hover)]:hover:-translate-y-1">
-                  <div className="w-12 h-12 rounded-2xl bg-ocean-yellow text-ocean-navy flex items-center justify-center mb-5 shadow-md">
-                    <Icon className="w-6 h-6" strokeWidth={1.75} aria-hidden="true" />
+                <div className="h-full rounded-2xl sm:rounded-[1.75rem] bg-white/12 md:bg-white/10 md:backdrop-blur-md p-4 sm:p-6 border border-ocean-sunlit/25 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [@media(hover:hover)]:hover:-translate-y-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-ocean-yellow text-ocean-navy flex items-center justify-center mb-3 sm:mb-5 shadow-md">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.75} aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-extrabold text-white">{item.title}</h3>
-                  <p className="mt-1.5 text-base text-ocean-muted">{item.detail}</p>
+                  <h3 className="text-base sm:text-xl font-extrabold text-white">{item.title}</h3>
+                  <p className="mt-1 text-xs sm:text-base text-ocean-muted">{item.detail}</p>
                 </div>
               </SectionReveal>
             );
@@ -62,7 +62,7 @@ export function WhyUsSection() {
 
         {/* Connected 3-Step Reminder Flow (Law of Uniform Connectedness) */}
         <SectionReveal delayMs={120}>
-          <div className="rounded-[2rem] bg-white/10 backdrop-blur-md border border-ocean-sunlit/30 p-6 sm:p-8">
+          <div className="rounded-3xl sm:rounded-[2rem] bg-white/12 md:bg-white/10 md:backdrop-blur-md border border-ocean-sunlit/30 p-4 sm:p-8">
             <p className="text-base font-extrabold text-ocean-yellow mb-5">
               {t.whyUs.flowTitle}
             </p>

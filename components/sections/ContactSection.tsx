@@ -150,11 +150,11 @@ export function ContactSection() {
                   <span>{t.contact.hoursTitle}</span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                <div className="flex flex-nowrap sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2 overflow-x-auto pb-1 sm:pb-0">
                   {contactInfo.weekDays.map((day) => (
                     <div
                       key={day.dayEn}
-                      className={`rounded-2xl p-2.5 text-center border ${
+                      className={`min-w-[84px] sm:min-w-0 shrink-0 rounded-2xl p-2.5 text-center border ${
                         day.isFriday
                           ? "bg-ocean-yellow-soft/70 border-ocean-yellow text-ocean-navy"
                           : "bg-ocean-ice border-ocean-border text-ocean-navy"

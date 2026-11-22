@@ -64,7 +64,7 @@ export function VetsSection() {
                       className="absolute inset-0 bg-gradient-to-t from-ocean-navy/65 via-transparent to-transparent"
                       aria-hidden="true"
                     />
-                    <span className="absolute top-2.5 start-2.5 inline-flex items-center gap-1 rounded-full bg-ocean-navy/85 backdrop-blur-md border border-white/20 text-ocean-sunlit px-2.5 py-0.5 text-xs font-extrabold">
+                    <span className="absolute top-2.5 start-2.5 inline-flex items-center gap-1 rounded-full bg-ocean-navy/92 md:bg-ocean-navy/85 md:backdrop-blur-md border border-white/20 text-ocean-sunlit px-2.5 py-0.5 text-xs font-extrabold">
                       <MapPin className="w-3 h-3 text-ocean-yellow" aria-hidden="true" />
                       <span>{area}</span>
                     </span>

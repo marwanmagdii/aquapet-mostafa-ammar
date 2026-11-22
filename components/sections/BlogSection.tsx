@@ -50,7 +50,7 @@ export function BlogSection() {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover:scale-105"
                   />
-                  <span className="absolute top-2.5 start-2.5 rounded-full bg-ocean-navy/85 backdrop-blur-md border border-white/20 text-ocean-yellow px-2.5 py-0.5 text-xs font-extrabold">
+                  <span className="absolute top-2.5 start-2.5 rounded-full bg-ocean-navy/92 md:bg-ocean-navy/85 md:backdrop-blur-md border border-white/20 text-ocean-yellow px-2.5 py-0.5 text-xs font-extrabold">
                     {locale === "ar" ? post.categoryAr : post.categoryEn}
                   </span>
                 </div>

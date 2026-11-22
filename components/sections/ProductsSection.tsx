@@ -63,15 +63,15 @@ export function ProductsSection() {
           </div>
         </div>
 
-        {/* Inline Store Category Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
+        {/* Inline Store Category Filter Tabs (Horizontal rail on mobile) */}
+        <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 mb-6 sm:mb-8 overflow-x-auto pb-1.5 sm:pb-0">
           <button
             type="button"
             onClick={() => {
               setSelectedCategory(null);
               setShowAll(false);
             }}
-            className={`min-h-[44px] rounded-full px-4 text-sm sm:text-base font-extrabold transition-colors cursor-pointer ${
+            className={`min-h-[42px] shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-extrabold transition-colors cursor-pointer ${
               selectedCategory === null && !showAll
                 ? "bg-ocean-primary text-white shadow-sm"
                 : "bg-white border border-ocean-border text-ocean-navy hover:bg-ocean-muted"
@@ -85,7 +85,7 @@ export function ProductsSection() {
               setSelectedCategory(null);
               setShowAll(true);
             }}
-            className={`min-h-[44px] rounded-full px-4 text-sm sm:text-base font-extrabold transition-colors cursor-pointer ${
+            className={`min-h-[42px] shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-extrabold transition-colors cursor-pointer ${
               selectedCategory === null && showAll
                 ? "bg-ocean-primary text-white shadow-sm"
                 : "bg-white border border-ocean-border text-ocean-navy hover:bg-ocean-muted"
@@ -100,7 +100,7 @@ export function ProductsSection() {
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(active ? null : (cat.id as ProductCategory))}
-                className={`min-h-[44px] rounded-full px-4 text-sm sm:text-base font-bold transition-colors cursor-pointer ${
+                className={`min-h-[42px] shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-bold transition-colors cursor-pointer ${
                   active
                     ? "bg-ocean-yellow text-ocean-navy font-extrabold shadow-sm"
                     : "bg-white border border-ocean-border text-ocean-navy hover:bg-ocean-muted"
@@ -168,7 +168,7 @@ export function ProductsSection() {
                         <span />
                       )}
 
-                      <span className="rounded-full bg-ocean-navy/80 backdrop-blur-md text-ocean-sunlit px-2.5 py-1 text-[11px] font-bold">
+                      <span className="rounded-full bg-ocean-navy/90 md:backdrop-blur-md text-ocean-sunlit px-2.5 py-1 text-[11px] font-bold">
                         {locale === "ar" ? "متوفر" : "In Stock"}
                       </span>
                     </div>

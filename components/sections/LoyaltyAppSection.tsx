@@ -61,8 +61,8 @@ export function LoyaltyAppSection() {
                 {t.loyaltyApp.subtitle}
               </p>
 
-              {/* Tier Segmented Selector (Hick's Law: clear benefit per option, no duplicate progress bar) */}
-              <div className="mt-5 grid grid-cols-3 gap-2.5">
+              {/* Tier Segmented Selector (Hick's Law: clear benefit per option, spacious on mobile) */}
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {t.loyaltyApp.tiers.map((tier, idx) => {
                   const isSelected = idx === activeTier;
                   const data = TIER_DATA[idx];
@@ -71,13 +71,13 @@ export function LoyaltyAppSection() {
                       key={tier}
                       type="button"
                       onClick={() => setActiveTier(idx)}
-                      className={`min-h-[60px] rounded-2xl px-3 py-2.5 text-center border transition-[background-color,transform,border-color] duration-200 active:scale-[0.98] cursor-pointer ${
+                      className={`min-h-[54px] sm:min-h-[60px] rounded-2xl px-4 sm:px-3 py-2.5 flex sm:block items-center justify-between text-start sm:text-center border transition-[background-color,transform,border-color] duration-200 active:scale-[0.98] cursor-pointer ${
                         isSelected
                           ? "bg-ocean-yellow text-ocean-navy border-ocean-yellow-hover font-extrabold shadow-md"
                           : "bg-white/10 text-white border-white/20 font-bold [@media(hover:hover)]:hover:bg-white/18"
                       }`}
                     >
-                      <span className="inline-flex items-center justify-center gap-1 text-sm font-extrabold">
+                      <span className="inline-flex items-center justify-center gap-1.5 text-sm font-extrabold">
                         <Award
                           className={`w-4 h-4 shrink-0 ${
                             isSelected ? "text-ocean-navy" : "text-ocean-yellow"
@@ -88,8 +88,8 @@ export function LoyaltyAppSection() {
                         <span>{tier}</span>
                       </span>
                       <span
-                        className={`mt-0.5 block text-[11px] leading-tight ${
-                          isSelected ? "text-ocean-navy/80 font-bold" : "text-ocean-muted/85 font-medium"
+                        className={`sm:mt-0.5 block text-xs sm:text-[11px] leading-tight ${
+                          isSelected ? "text-ocean-navy/85 font-bold" : "text-ocean-muted/90 font-medium"
                         }`}
                       >
                         {locale === "ar" ? data.perkAr : data.perkEn}
@@ -105,7 +105,7 @@ export function LoyaltyAppSection() {
                   href={earlyAccessUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[52px] inline-flex items-center justify-center gap-2.5 rounded-full bg-ocean-yellow [@media(hover:hover)]:hover:bg-ocean-yellow-hover text-ocean-navy font-extrabold text-base px-8 transition-[background-color,transform] duration-200 active:scale-[0.97] cursor-pointer shadow-md"
+                  className="w-full sm:w-auto min-h-[52px] inline-flex items-center justify-center gap-2.5 rounded-full bg-ocean-yellow [@media(hover:hover)]:hover:bg-ocean-yellow-hover text-ocean-navy font-extrabold text-base px-8 transition-[background-color,transform] duration-200 active:scale-[0.97] cursor-pointer shadow-md"
                 >
                   <Smartphone className="w-5 h-5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                   <span>{t.loyaltyApp.getApp}</span>

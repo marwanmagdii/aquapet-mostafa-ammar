@@ -77,10 +77,10 @@ export function Header() {
       }`}
     >
       <div
-        className={`mx-auto max-w-[1560px] rounded-full px-3 sm:px-4 py-1.5 flex items-center justify-between gap-2 sm:gap-3 transition-[background-color,border-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`mx-auto max-w-[1560px] rounded-full px-3 sm:px-4 py-1 sm:py-1.5 flex items-center justify-between gap-2 sm:gap-3 transition-[background-color,border-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           scrolled
-            ? "bg-ocean-ice/95 backdrop-blur-xl border border-ocean-deep/25 text-ocean-navy shadow-[0_8px_24px_rgba(42,108,165,0.12)]"
-            : "bg-ocean-primary-hover/82 backdrop-blur-md border border-ocean-sunlit/35 text-white"
+            ? "bg-ocean-ice md:bg-ocean-ice/95 md:backdrop-blur-xl border border-ocean-deep/25 text-ocean-navy shadow-[0_6px_18px_rgba(42,108,165,0.12)]"
+            : "bg-ocean-primary-hover/95 md:bg-ocean-primary-hover/82 md:backdrop-blur-md border border-ocean-sunlit/35 text-white"
         }`}
       >
         {/* Brand */}
@@ -272,8 +272,42 @@ export function Header() {
 
       {/* Mobile Drawer */}
       {menuOpen && (
-        <div className="xl:hidden mt-2 mx-auto max-w-[1560px] rounded-3xl bg-ocean-primary-hover/96 backdrop-blur-xl border border-ocean-sunlit/35 p-4 text-white shadow-[0_16px_40px_rgba(7,26,47,0.24)]">
-          <nav className="flex flex-col gap-2" aria-label="Mobile navigation">
+        <div className="xl:hidden mt-2 mx-auto max-w-[1560px] rounded-3xl bg-ocean-primary-hover border border-ocean-sunlit/35 p-4 text-white shadow-[0_16px_40px_rgba(7,26,47,0.24)] space-y-3">
+          <div className="relative md:hidden">
+            <Search
+              className="w-4 h-4 absolute top-1/2 -translate-y-1/2 start-3.5 text-white/80 pointer-events-none"
+              strokeWidth={2}
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={locale === "ar" ? "ابحث في المتجر..." : "Search store..."}
+              aria-label={locale === "ar" ? "ابحث في المتجر" : "Search store"}
+              className="w-full min-h-[44px] rounded-full ps-10 pe-4 text-sm font-medium bg-white/15 border border-white/30 text-white placeholder:text-white/75 outline-none"
+            />
+            {searchQuery.trim().length > 0 && searchResults.length > 0 && (
+              <div className="mt-2 rounded-2xl bg-white text-ocean-navy border border-ocean-border overflow-hidden divide-y divide-ocean-muted">
+                {searchResults.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/product/${p.id}/`}
+                    onClick={() => setMenuOpen(false)}
+                    className="p-2.5 flex items-center justify-between gap-2 hover:bg-ocean-ice"
+                  >
+                    <span className="text-sm font-extrabold truncate">
+                      {locale === "ar" ? p.nameAr : p.nameEn}
+                    </span>
+                    <span className="text-xs font-extrabold text-ocean-primary tabular-nums shrink-0">
+                      {p.priceEgp} {t.products.currency}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          <nav className="flex flex-col gap-1.5" aria-label="Mobile navigation">
             <Link
               href="/shop"
               onClick={() => setMenuOpen(false)}
