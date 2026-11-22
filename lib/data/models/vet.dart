@@ -9,6 +9,9 @@ class VetModel {
     required this.specialtyAr,
     required this.areaEn,
     required this.areaAr,
+    required this.imageAsset,
+    required this.bioEn,
+    required this.bioAr,
     this.phone,
     this.whatsapp,
     this.socialLinks = const {},
@@ -24,6 +27,9 @@ class VetModel {
   final String specialtyAr;
   final String areaEn;
   final String areaAr;
+  final String imageAsset;
+  final String bioEn;
+  final String bioAr;
   final String? phone;
   final String? whatsapp;
   final Map<String, String> socialLinks;
@@ -33,4 +39,5 @@ class VetModel {
   String clinic(bool isArabic) => isArabic ? clinicAr : clinicEn;
   String specialty(bool isArabic) => isArabic ? specialtyAr : specialtyEn;
   String area(bool isArabic) => isArabic ? areaAr : areaEn;
+  String bio(bool isArabic) => isArabic ? bioAr : bioEn;
 }

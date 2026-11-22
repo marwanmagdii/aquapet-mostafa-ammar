@@ -1072,7 +1072,7 @@ abstract final class MockCatalogData {
       pointsCost: 250,
       discountEgp: 25,
       isFreeItem: false,
-      imageAsset: 'assets/images/products/reward_voucher.svg',
+      imageAsset: 'assets/images/products/reward_voucher.jpg',
     ),
     RewardItem(
       id: 'rw_50egp',
@@ -1083,7 +1083,7 @@ abstract final class MockCatalogData {
       pointsCost: 500,
       discountEgp: 50,
       isFreeItem: false,
-      imageAsset: 'assets/images/products/reward_voucher.svg',
+      imageAsset: 'assets/images/products/reward_voucher.jpg',
     ),
     RewardItem(
       id: 'rw_100egp',
@@ -1094,7 +1094,7 @@ abstract final class MockCatalogData {
       pointsCost: 950,
       discountEgp: 100,
       isFreeItem: false,
-      imageAsset: 'assets/images/products/reward_voucher.svg',
+      imageAsset: 'assets/images/products/reward_voucher.jpg',
     ),
     RewardItem(
       id: 'rw_free_betta_food',
@@ -1106,6 +1106,8 @@ abstract final class MockCatalogData {
       discountEgp: 120,
       isFreeItem: true,
       imageAsset: 'assets/images/products/food_betta_bio_gold.svg',
+      imageUrl:
+          'https://images.pexels.com/photos/2564496/pexels-photo-2564496.jpeg?cs=tinysrgb&dpr=1&w=500',
     ),
     RewardItem(
       id: 'rw_free_flakes',
@@ -1117,6 +1119,8 @@ abstract final class MockCatalogData {
       discountEgp: 140,
       isFreeItem: true,
       imageAsset: 'assets/images/products/food_tetramin_flakes.svg',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/5/5b/Aquarium_-_dried_food.jpg',
     ),
     RewardItem(
       id: 'rw_free_cond',
@@ -1128,6 +1132,8 @@ abstract final class MockCatalogData {
       discountEgp: 160,
       isFreeItem: true,
       imageAsset: 'assets/images/products/care_prime_conditioner.svg',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/9/94/2_oz_-_60_ml_Amber_Glass_Boston_Round_Bottles_with_Gold_Metal_and_Glass_Droppers.jpg',
     ),
     RewardItem(
       id: 'rw_free_java',
@@ -1139,6 +1145,8 @@ abstract final class MockCatalogData {
       discountEgp: 130,
       isFreeItem: true,
       imageAsset: 'assets/images/products/decor_java_fern.svg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1779436853149-2e7d501f71cf?fm=jpg&q=80&w=600&auto=format&fit=crop',
     ),
     RewardItem(
       id: 'rw_free_delivery',
@@ -1149,7 +1157,7 @@ abstract final class MockCatalogData {
       pointsCost: 300,
       discountEgp: 65,
       isFreeItem: false,
-      imageAsset: 'assets/images/products/reward_delivery.svg',
+      imageAsset: 'assets/images/products/reward_delivery.jpg',
     ),
   ];
 
@@ -1271,6 +1279,10 @@ abstract final class MockCatalogData {
           type: ReminderType.foodRunOut,
           titleEn: 'TetraMin Tropical Flakes (100g)',
           titleAr: 'رقائق تترامين الاستوائية (١٠٠ جم)',
+          descriptionEn:
+              'Main daily flakes stored on the shelf beside the 60L tank. Reorder before the bag finishes.',
+          descriptionAr:
+              'الرقائق اليومية الأساسية موجودة على الرف بجانب حوض ٦٠ لتر. يُفضل إعادة الطلب قبل النفاد.',
           isEnabled: true,
           createdAt: now.subtract(const Duration(days: 21)),
           tankId: 'tank_living_60',
@@ -1283,6 +1295,10 @@ abstract final class MockCatalogData {
           type: ReminderType.feedingSchedule,
           titleEn: 'Feed Living Room 60L',
           titleAr: 'إطعام حوض الصالة ٦٠ لتر',
+          descriptionEn:
+              'Give one small pinch of TetraMin flakes (2g). Do not overfeed — all flakes should be eaten within 2 minutes.',
+          descriptionAr:
+              'أعطِ رشة صغيرة من رقائق تترامين (٢ جم). لا تُكثر من الطعام بحيث ينتهي خلال دقيقتين.',
           isEnabled: true,
           createdAt: now,
           tankId: 'tank_living_60',
@@ -1296,6 +1312,10 @@ abstract final class MockCatalogData {
           type: ReminderType.waterChange,
           titleEn: '25% Water Change • Living Room 60L',
           titleAr: 'تغيير ٢٥٪ من الماء • حوض الصالة ٦٠ لتر',
+          descriptionEn:
+              'Siphon 15L from the bottom, add dechlorinated room-temperature water using AquaSafe conditioner.',
+          descriptionAr:
+              'اسحب ١٥ لتراً من قاع الحوض وأضف ماءً بدرجة حرارة الغرفة مع مزيل الكلور أكواسيف.',
           isEnabled: true,
           createdAt: now.subtract(const Duration(days: 5)),
           tankId: 'tank_living_60',
@@ -1307,6 +1327,10 @@ abstract final class MockCatalogData {
           type: ReminderType.filterMedia,
           titleEn: 'Rinse Sponge & Replace Carbon',
           titleAr: 'تنظيف الإسفنجة وتغيير الكربون',
+          descriptionEn:
+              'Rinse the filter sponge gently in old tank water (never tap water) to protect beneficial bacteria.',
+          descriptionAr:
+              'اشطف إسفنجة الفلتر برفق في ماء الحوض القديم (وليس ماء الصنبور) للحفاظ على البكتيريا النافعة.',
           isEnabled: true,
           createdAt: now.subtract(const Duration(days: 16)),
           tankId: 'tank_living_60',

@@ -362,6 +362,7 @@ class _LoyaltyTab extends ConsumerWidget {
                     children: [
                       ProductImagePlaceholder(
                         height: 92,
+                        imageUrl: reward.imageUrl,
                         imageAsset: reward.imageAsset,
                         icon: PhosphorIcons.gift(),
                         gradientColors: [colors.primary, colors.secondary],

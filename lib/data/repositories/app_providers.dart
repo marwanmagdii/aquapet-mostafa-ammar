@@ -666,6 +666,25 @@ class RemindersNotifier extends StateNotifier<AsyncValue<List<ReminderModel>>> {
     await _repo.saveReminders(list);
   }
 
+  Future<void> updateReminderDetails(
+    String id, {
+    required String title,
+    String? description,
+  }) async {
+    final list = [...(state.valueOrNull ?? const <ReminderModel>[])];
+    final idx = list.indexWhere((r) => r.id == id);
+    if (idx < 0) return;
+    final cleanDesc = description?.trim();
+    list[idx] = list[idx].copyWith(
+      titleEn: title.trim(),
+      titleAr: title.trim(),
+      descriptionEn: (cleanDesc == null || cleanDesc.isEmpty) ? '' : cleanDesc,
+      descriptionAr: (cleanDesc == null || cleanDesc.isEmpty) ? '' : cleanDesc,
+    );
+    state = AsyncValue.data(list);
+    await _repo.saveReminders(list);
+  }
+
   Future<void> deleteReminder(String id) async {
     final list = (state.valueOrNull ?? const <ReminderModel>[])
         .where((r) => r.id != id)

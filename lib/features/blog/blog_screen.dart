@@ -20,7 +20,14 @@ class BlogListScreen extends ConsumerStatefulWidget {
 }
 
 class _BlogListScreenState extends ConsumerState<BlogListScreen> {
+  final _searchCtrl = TextEditingController();
   String? _selectedCategoryEn;
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,17 +75,38 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
             }
           }
 
-          final filtered = _selectedCategoryEn == null
-              ? posts
-              : posts
-                  .where((p) => p.categoryEn == _selectedCategoryEn)
-                  .toList();
-
-          final featured = filtered.first;
-          final rest = filtered.skip(1).toList();
+          final query = _searchCtrl.text.trim().toLowerCase();
+          final filtered = posts.where((p) {
+            if (_selectedCategoryEn != null &&
+                p.categoryEn != _selectedCategoryEn) {
+              return false;
+            }
+            if (query.isNotEmpty) {
+              final haystack =
+                  '${p.titleEn} ${p.titleAr} ${p.summaryEn} ${p.summaryAr} ${p.authorName} ${p.categoryEn} ${p.categoryAr}'
+                      .toLowerCase();
+              if (!haystack.contains(query)) return false;
+            }
+            return true;
+          }).toList();
 
           return Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                ),
+                child: AppSearchField(
+                  controller: _searchCtrl,
+                  hint: isAr
+                      ? 'ابحث في المقالات والأدلة...'
+                      : 'Search care guides & articles...',
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
               SizedBox(
                 height: 44,
                 child: ListView(
@@ -110,12 +138,25 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Expanded(
-                child: ListView(
+                child: filtered.isEmpty
+                    ? AppEmptyState(
+                        icon: PhosphorIcons.magnifyingGlass(),
+                        title: isAr ? 'لا توجد مقالات مطابقة' : 'No matching guides',
+                        subtitle: isAr
+                            ? 'جرب كلمة بحث أخرى'
+                            : 'Try another search term or category',
+                        actionLabel: isAr ? 'إعادة ضبط' : 'Reset',
+                        onAction: () => setState(() {
+                          _searchCtrl.clear();
+                          _selectedCategoryEn = null;
+                        }),
+                      )
+                    : ListView(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   children: [
                     // Featured Hero Guide
                     AppCard(
-                      onTap: () => context.push('/blog/${featured.id}'),
+                      onTap: () => context.push('/blog/${filtered.first.id}'),
                       padding: EdgeInsets.zero,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +164,7 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
                           ProductImagePlaceholder(
                             height: 176,
                             borderRadius: 0,
-                            imageUrl: featured.imageUrl,
+                            imageUrl: filtered.first.imageUrl,
                             icon: PhosphorIcons.bookOpenText(),
                             gradientColors: [colors.primary, colors.secondary],
                           ),
@@ -135,12 +176,12 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
                                 Row(
                                   children: [
                                     AppBadge(
-                                      label: featured.category(isAr),
+                                      label: filtered.first.category(isAr),
                                       tone: AppBadgeTone.primary,
                                     ),
                                     const SizedBox(width: AppSpacing.sm),
                                     Text(
-                                      '${featured.readMinutes} ${l10n.blogMinRead}',
+                                      '${filtered.first.readMinutes} ${l10n.blogMinRead}',
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall
@@ -152,13 +193,13 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
                                 Text(
-                                  featured.title(isAr),
+                                  filtered.first.title(isAr),
                                   style:
                                       Theme.of(context).textTheme.titleMedium,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  featured.summary(isAr),
+                                  filtered.first.summary(isAr),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context)
@@ -173,7 +214,7 @@ class _BlogListScreenState extends ConsumerState<BlogListScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    ...rest.map(
+                    ...filtered.skip(1).map(
                       (post) => Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                         child: AppCard(

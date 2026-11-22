@@ -66,7 +66,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
     final colors = context.appColors;
     final productsAsync = ref.watch(productsProvider);
     final favorites = ref.watch(favoritesProvider);
+    final cartItems = ref.watch(cartProvider).valueOrNull ?? const [];
     final cartCount = ref.watch(cartCountProvider);
+    final hasActiveFilters =
+        _inStockOnly || _maxPrice < 5000 || _sort != _ShopSort.featured;
 
     return Scaffold(
       appBar: AppBar(
@@ -100,11 +103,6 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
             color: _favoritesOnly ? colors.danger : colors.foreground,
             tooltip: isAr ? 'المفضلة' : 'Favorites',
             onPressed: () => setState(() => _favoritesOnly = !_favoritesOnly),
-          ),
-          AppIconButton(
-            icon: PhosphorIcons.slidersHorizontal(),
-            tooltip: isAr ? 'تصفية وترتيب' : 'Filter & Sort',
-            onPressed: () => _openFilterSheet(context, isAr),
           ),
           BouncingCartButton(
             key: _cartKey,
@@ -160,12 +158,24 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                   AppSpacing.md,
                   AppSpacing.sm,
                 ),
-                child: AppSearchField(
-                  controller: _searchCtrl,
-                  hint: isAr
-                      ? 'ابحث عن أسماك، طعام، أحواض...'
-                      : 'Search fish, food, tanks...',
-                  onChanged: (_) => setState(() {}),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: AppSearchField(
+                        controller: _searchCtrl,
+                        hint: isAr
+                            ? 'ابحث عن أسماك، طعام، أحواض...'
+                            : 'Search fish, food, tanks...',
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    _FilterButton(
+                      hasActiveFilters: hasActiveFilters,
+                      tooltip: isAr ? 'تصفية وترتيب' : 'Filter & Sort',
+                      onTap: () => _openFilterSheet(context, isAr),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -224,16 +234,27 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                           maxCrossAxisExtent: 230,
                           mainAxisSpacing: AppSpacing.md,
                           crossAxisSpacing: AppSpacing.md,
-                          mainAxisExtent: 238,
+                          mainAxisExtent: 282,
                         ),
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final product = filtered[index];
+                          final defaultVariant = product.variants.first;
                           final isFav = favorites.contains(product.id);
+                          final qtyInCart = cartItems
+                              .where(
+                                (item) =>
+                                    item.productId == product.id &&
+                                    item.variantId == defaultVariant.id,
+                              )
+                              .fold<int>(0, (sum, item) => sum + item.quantity);
                           final imageKey = GlobalKey();
                           return AppCard(
                             onTap: () => context.push('/product/${product.id}'),
                             padding: EdgeInsets.zero,
+                            borderColor: qtyInCart > 0
+                                ? colors.primary.withOpacity(0.55)
+                                : null,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -258,54 +279,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                                     ),
                                     PositionedDirectional(
                                       top: 8,
-                                      start: 8,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 3,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.92),
-                                          borderRadius: BorderRadius.circular(
-                                            AppRadii.pill,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 6,
-                                              height: 6,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: product.hasStock
-                                                    ? colors.success
-                                                    : colors.danger,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              product.hasStock
-                                                  ? (isAr ? 'متوفر' : 'In Stock')
-                                                  : (isAr ? 'نفد' : 'Out'),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelSmall
-                                                  ?.copyWith(
-                                                    color: colors.foreground,
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 10,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    PositionedDirectional(
-                                      top: 6,
-                                      end: 6,
+                                      end: 8,
                                       child: Material(
-                                        color: Colors.white.withOpacity(0.9),
+                                        color: Colors.white.withOpacity(0.92),
+                                        elevation: 1,
                                         shape: const CircleBorder(),
                                         child: InkWell(
                                           customBorder: const CircleBorder(),
@@ -313,7 +290,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                                               .read(favoritesProvider.notifier)
                                               .toggle(product.id),
                                           child: Padding(
-                                            padding: const EdgeInsets.all(6),
+                                            padding: const EdgeInsets.all(7),
                                             child: Icon(
                                               isFav
                                                   ? PhosphorIcons.heart(
@@ -345,23 +322,23 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                                       children: [
                                         Text(
                                           product.name(isAr),
-                                          maxLines: 1,
+                                          maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleSmall
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,
+                                                height: 1.2,
                                               ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 3),
                                         Text(
                                           product.isLiveFish
                                               ? (isAr
-                                                  ? 'سمك حي • ${product.variants.first.label(isAr)}'
-                                                  : 'Live fish • ${product.variants.first.label(isAr)}')
-                                              : product.variants.first
-                                                  .label(isAr),
+                                                  ? 'سمك حي • ${defaultVariant.label(isAr)}'
+                                                  : 'Live fish • ${defaultVariant.label(isAr)}')
+                                              : defaultVariant.label(isAr),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context)
@@ -374,86 +351,72 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                                               ),
                                         ),
                                         const Spacer(),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                ProductVisuals.formatEgp(
-                                                  product.startingPrice,
-                                                  isAr,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleSmall
-                                                    ?.copyWith(
-                                                      color: colors.primary,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    ),
+                                        Text(
+                                          ProductVisuals.formatEgp(
+                                            product.startingPrice,
+                                            isAr,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                color: colors.primary,
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 15,
                                               ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Material(
-                                              color: colors.primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: InkWell(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                onTap: () {
-                                                  FlyToCartAnimation.run(
-                                                    context: context,
-                                                    sourceKey: imageKey,
-                                                    targetKey: _cartKey,
-                                                    vsync: this,
-                                                    flyingChild:
-                                                        ProductImagePlaceholder(
-                                                      height: 72,
-                                                      width: 72,
-                                                      borderRadius: AppRadii.md,
-                                                      imageUrl:
-                                                          product.imageUrl,
-                                                      imageAsset: ProductVisuals
-                                                          .imageAssetForProduct(
-                                                        product,
-                                                      ),
-                                                      icon: ProductVisuals
-                                                          .iconForCategory(
-                                                        product.category,
-                                                      ),
-                                                      gradientColors:
-                                                          ProductVisuals
-                                                              .colorsForProduct(
-                                                        product,
-                                                      ),
-                                                    ),
-                                                    onArrive: () => ref
-                                                        .read(
-                                                          cartProvider.notifier,
-                                                        )
-                                                        .addItem(
-                                                          product.id,
-                                                          product
-                                                              .variants.first.id,
-                                                        ),
-                                                  );
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(7),
-                                                  child: Icon(
-                                                    PhosphorIcons.plus(),
-                                                    size: 16,
-                                                    color: colors.onPrimary,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _AddOrStepperButton(
+                                          qty: qtyInCart,
+                                          isAr: isAr,
+                                          onAddFirst: () {
+                                            FlyToCartAnimation.run(
+                                              context: context,
+                                              sourceKey: imageKey,
+                                              targetKey: _cartKey,
+                                              vsync: this,
+                                              flyingChild:
+                                                  ProductImagePlaceholder(
+                                                height: 72,
+                                                width: 72,
+                                                borderRadius: AppRadii.md,
+                                                imageUrl: product.imageUrl,
+                                                imageAsset: ProductVisuals
+                                                    .imageAssetForProduct(
+                                                  product,
+                                                ),
+                                                icon: ProductVisuals
+                                                    .iconForCategory(
+                                                  product.category,
+                                                ),
+                                                gradientColors: ProductVisuals
+                                                    .colorsForProduct(
+                                                  product,
+                                                ),
+                                              ),
+                                              onArrive: () => ref
+                                                  .read(cartProvider.notifier)
+                                                  .addItem(
+                                                    product.id,
+                                                    defaultVariant.id,
                                                   ),
-                                                ),
+                                            );
+                                          },
+                                          onIncrement: () => ref
+                                              .read(cartProvider.notifier)
+                                              .addItem(
+                                                product.id,
+                                                defaultVariant.id,
                                               ),
-                                            ),
-                                          ],
+                                          onDecrement: () => ref
+                                              .read(cartProvider.notifier)
+                                              .updateQuantity(
+                                                product.id,
+                                                defaultVariant.id,
+                                                qtyInCart - 1,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -475,91 +438,326 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
   void _openFilterSheet(BuildContext context, bool isAr) {
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
       showDragHandle: true,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isAr ? 'تصفية وترتيب' : 'Filter & Sort',
-                    style: Theme.of(ctx).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(isAr ? 'المتوفر فقط' : 'In stock only'),
-                    value: _inStockOnly,
-                    onChanged: (v) {
-                      setModalState(() => _inStockOnly = v);
-                      setState(() {});
-                    },
-                  ),
-                  Text(
-                    isAr
-                        ? 'الحد الأقصى للسعر: ${_maxPrice.toInt()} ج.م'
-                        : 'Max price: ${_maxPrice.toInt()} EGP',
-                  ),
-                  Slider(
-                    min: 100,
-                    max: 5000,
-                    divisions: 49,
-                    value: _maxPrice,
-                    onChanged: (v) {
-                      setModalState(() => _maxPrice = v);
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    isAr ? 'الترتيب' : 'Sort by',
-                    style: Theme.of(ctx).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: Text(isAr ? 'المميز' : 'Featured'),
-                        selected: _sort == _ShopSort.featured,
-                        onSelected: (_) {
-                          setModalState(() => _sort = _ShopSort.featured);
-                          setState(() {});
-                        },
-                      ),
-                      ChoiceChip(
-                        label: Text(isAr ? 'الأقل سعراً' : 'Price: Low-High'),
-                        selected: _sort == _ShopSort.priceLowHigh,
-                        onSelected: (_) {
-                          setModalState(() => _sort = _ShopSort.priceLowHigh);
-                          setState(() {});
-                        },
-                      ),
-                      ChoiceChip(
-                        label: Text(isAr ? 'الأعلى سعراً' : 'Price: High-Low'),
-                        selected: _sort == _ShopSort.priceHighLow,
-                        onSelected: (_) {
-                          setModalState(() => _sort = _ShopSort.priceHighLow);
-                          setState(() {});
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  AppPrimaryButton(
-                    label: isAr ? 'تطبيق' : 'Apply',
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
+            return SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isAr ? 'تصفية وترتيب' : 'Filter & Sort',
+                          style: Theme.of(ctx).textTheme.titleLarge,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _inStockOnly = false;
+                              _maxPrice = 5000;
+                              _sort = _ShopSort.featured;
+                              _selectedCategory = null;
+                              _favoritesOnly = false;
+                            });
+                            setState(() {});
+                          },
+                          child: Text(isAr ? 'إعادة ضبط' : 'Reset'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(isAr ? 'المتوفر فقط' : 'In stock only'),
+                      value: _inStockOnly,
+                      onChanged: (v) {
+                        setModalState(() => _inStockOnly = v);
+                        setState(() {});
+                      },
+                    ),
+                    Text(
+                      isAr
+                          ? 'الحد الأقصى للسعر: ${_maxPrice.toInt()} ج.م'
+                          : 'Max price: ${_maxPrice.toInt()} EGP',
+                    ),
+                    Slider(
+                      min: 100,
+                      max: 5000,
+                      divisions: 49,
+                      value: _maxPrice,
+                      onChanged: (v) {
+                        setModalState(() => _maxPrice = v);
+                        setState(() {});
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      isAr ? 'الترتيب' : 'Sort by',
+                      style: Theme.of(ctx).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        ChoiceChip(
+                          label: Text(isAr ? 'المميز' : 'Featured'),
+                          selected: _sort == _ShopSort.featured,
+                          onSelected: (_) {
+                            setModalState(() => _sort = _ShopSort.featured);
+                            setState(() {});
+                          },
+                        ),
+                        ChoiceChip(
+                          label: Text(isAr ? 'الأقل سعراً' : 'Price: Low-High'),
+                          selected: _sort == _ShopSort.priceLowHigh,
+                          onSelected: (_) {
+                            setModalState(() => _sort = _ShopSort.priceLowHigh);
+                            setState(() {});
+                          },
+                        ),
+                        ChoiceChip(
+                          label: Text(isAr ? 'الأعلى سعراً' : 'Price: High-Low'),
+                          selected: _sort == _ShopSort.priceHighLow,
+                          onSelected: (_) {
+                            setModalState(() => _sort = _ShopSort.priceHighLow);
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppSecondaryButton(
+                            label: isAr ? 'إعادة ضبط' : 'Reset',
+                            onPressed: () {
+                              setModalState(() {
+                                _inStockOnly = false;
+                                _maxPrice = 5000;
+                                _sort = _ShopSort.featured;
+                                _selectedCategory = null;
+                                _favoritesOnly = false;
+                              });
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          flex: 2,
+                          child: AppPrimaryButton(
+                            label: isAr ? 'تطبيق' : 'Apply',
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           },
         );
       },
+    );
+  }
+}
+
+class _FilterButton extends StatelessWidget {
+  const _FilterButton({
+    required this.hasActiveFilters,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final bool hasActiveFilters;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: hasActiveFilters
+            ? colors.primary.withOpacity(0.10)
+            : colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+          side: BorderSide(
+            color: hasActiveFilters ? colors.primary : colors.border,
+            width: hasActiveFilters ? 1.5 : 1,
+          ),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+          child: SizedBox(
+            width: 48,
+            height: 48,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  PhosphorIcons.slidersHorizontal(),
+                  size: 20,
+                  color: hasActiveFilters ? colors.primary : colors.foreground,
+                ),
+                if (hasActiveFilters)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: colors.accent,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.surface, width: 1.5),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddOrStepperButton extends StatelessWidget {
+  const _AddOrStepperButton({
+    required this.qty,
+    required this.isAr,
+    required this.onAddFirst,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
+
+  final int qty;
+  final bool isAr;
+  final VoidCallback onAddFirst;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: qty <= 0
+          ? SizedBox(
+              key: const ValueKey('add_btn'),
+              width: double.infinity,
+              height: 38,
+              child: Material(
+                color: colors.primary,
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+                child: InkWell(
+                  onTap: onAddFirst,
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        PhosphorIcons.plus(PhosphorIconsStyle.bold),
+                        size: 15,
+                        color: colors.onPrimary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        isAr ? 'أضف للسلة' : 'Add',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: colors.onPrimary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : Container(
+              key: const ValueKey('stepper_btn'),
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: colors.primary.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+                border: Border.all(
+                  color: colors.primary.withOpacity(0.45),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Material(
+                    color: Colors.transparent,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      onTap: onDecrement,
+                      customBorder: const CircleBorder(),
+                      child: SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: Icon(
+                          qty == 1
+                              ? PhosphorIcons.trash()
+                              : PhosphorIcons.minus(PhosphorIconsStyle.bold),
+                          size: 15,
+                          color: qty == 1 ? colors.danger : colors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 160),
+                    child: Text(
+                      '$qty',
+                      key: ValueKey(qty),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                  ),
+                  Material(
+                    color: colors.primary,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      onTap: onIncrement,
+                      customBorder: const CircleBorder(),
+                      child: SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: Icon(
+                          PhosphorIcons.plus(PhosphorIconsStyle.bold),
+                          size: 15,
+                          color: colors.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }

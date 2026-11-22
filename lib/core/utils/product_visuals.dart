@@ -6,12 +6,23 @@ import '../../data/models/product.dart';
 abstract final class ProductVisuals {
   static IconData iconForCategory(ProductCategory category) {
     return switch (category) {
-      ProductCategory.fish => PhosphorIcons.fishSimple(),
-      ProductCategory.food => PhosphorIcons.bowlFood(),
-      ProductCategory.tanks => PhosphorIcons.cubeTransparent(),
-      ProductCategory.filters => PhosphorIcons.funnel(),
-      ProductCategory.waterCare => PhosphorIcons.drop(),
-      ProductCategory.decor => PhosphorIcons.plant(),
+      ProductCategory.fish => PhosphorIcons.fishSimple(PhosphorIconsStyle.duotone),
+      ProductCategory.food => PhosphorIcons.bowlFood(PhosphorIconsStyle.duotone),
+      ProductCategory.tanks => PhosphorIcons.cubeTransparent(PhosphorIconsStyle.duotone),
+      ProductCategory.filters => PhosphorIcons.funnel(PhosphorIconsStyle.duotone),
+      ProductCategory.waterCare => PhosphorIcons.drop(PhosphorIconsStyle.duotone),
+      ProductCategory.decor => PhosphorIcons.plant(PhosphorIconsStyle.duotone),
+    };
+  }
+
+  static Color colorForCategory(ProductCategory category) {
+    return switch (category) {
+      ProductCategory.fish => const Color(0xFF0284C7), // Ocean blue
+      ProductCategory.food => const Color(0xFFEA580C), // Warm amber
+      ProductCategory.tanks => const Color(0xFF0D9488), // Deep teal
+      ProductCategory.filters => const Color(0xFF4F46E5), // Indigo
+      ProductCategory.waterCare => const Color(0xFF0891B2), // Cyan
+      ProductCategory.decor => const Color(0xFF059669), // Emerald
     };
   }
 

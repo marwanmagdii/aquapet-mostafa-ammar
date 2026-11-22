@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../core/tokens/app_tokens.dart';
 import '../../core/utils/product_visuals.dart';
 import '../../data/models/cart_order.dart';
 import '../../data/repositories/app_providers.dart';
+import '../../shared/widgets/receipt_printer_dialog.dart';
 import '../../shared/widgets/shared_widgets.dart';
 
 class OrdersScreen extends ConsumerWidget {
@@ -20,7 +21,23 @@ class OrdersScreen extends ConsumerWidget {
     final ordersAsync = ref.watch(ordersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(isAr ? 'طلباتي' : 'My Orders')),
+      appBar: AppBar(
+        leading: IconButton(
+          tooltip: isAr ? 'رجوع' : 'Back',
+          icon: Icon(
+            isAr ? PhosphorIcons.arrowRight() : PhosphorIcons.arrowLeft(),
+            textDirection: TextDirection.ltr,
+          ),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/profile');
+            }
+          },
+        ),
+        title: Text(isAr ? 'طلباتي' : 'My Orders'),
+      ),
       body: ordersAsync.when(
         loading: () => const AppLoadingState(),
         error: (_, __) => AppErrorState(
@@ -139,32 +156,48 @@ class OrdersScreen extends ConsumerWidget {
                           '${isAr ? 'الإجمالي:' : 'Total:'} ${ProductVisuals.formatEgp(order.totalEgp, isAr)}',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Row(
-                          children: [
-                            if (order.status != OrderStatus.delivered)
-                              TextButton(
-                                onPressed: () => ref
-                                    .read(ordersProvider.notifier)
-                                    .advanceStatus(order.id),
-                                child: Text(
-                                  isAr ? 'تحديث الحالة' : 'Advance',
-                                ),
-                              ),
-                            const SizedBox(width: 4),
-                            AppSecondaryButton(
-                              label: isAr ? 'إعادة الطلب' : 'Reorder',
-                              onPressed: () async {
-                                for (final item in order.items) {
-                                  await ref.read(cartProvider.notifier).addItem(
-                                        item.productId,
-                                        item.variantId,
-                                        qty: item.quantity,
-                                      );
-                                }
-                                if (context.mounted) context.push('/cart');
-                              },
+                        if (order.status != OrderStatus.delivered)
+                          TextButton(
+                            onPressed: () => ref
+                                .read(ordersProvider.notifier)
+                                .advanceStatus(order.id),
+                            child: Text(
+                              isAr ? 'تحديث الحالة' : 'Advance',
                             ),
-                          ],
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppSecondaryButton(
+                            icon: PhosphorIcons.receipt(),
+                            label: isAr ? 'عرض الإيصال' : 'View Receipt',
+                            onPressed: () => ReceiptPrinterDialog.show(
+                              context: context,
+                              order: order,
+                              isAr: isAr,
+                              onTrackOrder: () {},
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: AppPrimaryButton(
+                            icon: PhosphorIcons.arrowsClockwise(),
+                            label: isAr ? 'إعادة الطلب' : 'Reorder',
+                            onPressed: () async {
+                              for (final item in order.items) {
+                                await ref.read(cartProvider.notifier).addItem(
+                                      item.productId,
+                                      item.variantId,
+                                      qty: item.quantity,
+                                    );
+                              }
+                              if (context.mounted) context.push('/cart');
+                            },
+                          ),
                         ),
                       ],
                     ),

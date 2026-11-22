@@ -118,37 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 // 1. Horizontal Scrollable Ad Banner Carousel
                 _AdBannerCarousel(isAr: isAr),
 
-                // 2. Quick Glance Strip (Loyalty + My Tank)
-                const SizedBox(height: AppSpacing.md),
-                _QuickGlanceStrip(isAr: isAr),
-
-                // 2b. Trusted Vets Entry Card
-                const SizedBox(height: AppSpacing.sm),
-                _TrustedVetsHomeCard(isAr: isAr),
-
-                // 2c. Care Blog Entry Card
-                const SizedBox(height: AppSpacing.sm),
-                _CareBlogHomeCard(isAr: isAr),
-
-                // 2. Running Low Food Alert
-                if (lowFoodReminders.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  _RunningLowAlert(
-                    reminder: lowFoodReminders.first,
-                    daysLeft: lowFoodReminders.first.daysLeftAt(now),
-                    isAr: isAr,
-                    onReorder: () {
-                      final pid = lowFoodReminders.first.productId;
-                      if (pid != null) {
-                        context.push('/product/$pid');
-                      } else {
-                        context.go('/reminders');
-                      }
-                    },
-                  ),
-                ],
-
-                // 4. Categories Row
+                // 2. Categories Row
                 const SizedBox(height: AppSpacing.lg),
                 _SectionHeader(
                   title: isAr ? 'التصنيفات' : 'Categories',
@@ -165,6 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         const SizedBox(width: AppSpacing.sm),
                     itemBuilder: (context, index) {
                       final cat = ProductCategory.values[index];
+                      final catColor = ProductVisuals.colorForCategory(cat);
                       return AppCard(
                         onTap: () => context.go('/shop?cat=${cat.name}'),
                         padding: const EdgeInsets.symmetric(
@@ -180,13 +151,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 width: 42,
                                 height: 42,
                                 decoration: BoxDecoration(
-                                  color: colors.primary.withOpacity(0.10),
+                                  color: catColor.withOpacity(0.14),
                                   borderRadius:
                                       BorderRadius.circular(AppRadii.md),
                                 ),
                                 child: Icon(
                                   ProductVisuals.iconForCategory(cat),
-                                  color: colors.primary,
+                                  color: catColor,
                                   size: 22,
                                 ),
                               ),
@@ -342,6 +313,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                         ),
                       ),
+                ],
+                // Quick Glance Strip (Loyalty + My Tank), Vets, Blog & Low Food Alert
+                const SizedBox(height: AppSpacing.lg),
+                _QuickGlanceStrip(isAr: isAr),
+                const SizedBox(height: AppSpacing.sm),
+                _TrustedVetsHomeCard(isAr: isAr),
+                const SizedBox(height: AppSpacing.sm),
+                _CareBlogHomeCard(isAr: isAr),
+                if (lowFoodReminders.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  _RunningLowAlert(
+                    reminder: lowFoodReminders.first,
+                    daysLeft: lowFoodReminders.first.daysLeftAt(now),
+                    isAr: isAr,
+                    onReorder: () {
+                      final pid = lowFoodReminders.first.productId;
+                      if (pid != null) {
+                        context.push('/product/$pid');
+                      } else {
+                        context.go('/reminders');
+                      }
+                    },
+                  ),
                 ],
                 const SizedBox(height: AppSpacing.md),
                 _FollowShopSocialCard(isAr: isAr),
@@ -510,11 +504,11 @@ class _AdBannerCarouselState extends State<_AdBannerCarousel> {
                               begin: AlignmentDirectional.centerStart,
                               end: AlignmentDirectional.centerEnd,
                               colors: [
-                                ad.gradient.first.withOpacity(0.92),
-                                ad.gradient.first.withOpacity(0.72),
-                                ad.gradient.last.withOpacity(0.15),
+                                Colors.black.withOpacity(0.62),
+                                Colors.black.withOpacity(0.36),
+                                Colors.black.withOpacity(0.05),
                               ],
-                              stops: const [0.0, 0.52, 1.0],
+                              stops: const [0.0, 0.55, 1.0],
                             ),
                           ),
                         ),
@@ -533,7 +527,7 @@ class _AdBannerCarouselState extends State<_AdBannerCarousel> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.24),
+                                    color: Colors.black.withOpacity(0.38),
                                     borderRadius:
                                         BorderRadius.circular(AppRadii.pill),
                                   ),

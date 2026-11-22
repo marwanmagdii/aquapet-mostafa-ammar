@@ -1,5 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -17,14 +21,206 @@ class CouponsTab extends ConsumerStatefulWidget {
   ConsumerState<CouponsTab> createState() => _CouponsTabState();
 }
 
-class _CouponsTabState extends ConsumerState<CouponsTab> {
+class _CouponsTabState extends ConsumerState<CouponsTab>
+    with SingleTickerProviderStateMixin {
   final _codeCtrl = TextEditingController();
+  late final AnimationController _shakeCtrl;
   CouponStatus _statusFilter = CouponStatus.available;
+  String? _codeError;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 420),
+    );
+  }
 
   @override
   void dispose() {
+    _shakeCtrl.dispose();
     _codeCtrl.dispose();
     super.dispose();
+  }
+
+  void _checkCoupon(bool isAr, AppColorsExtension colors) {
+    final match = ref
+        .read(couponsProvider.notifier)
+        .findAvailableByCode(_codeCtrl.text);
+    if (match == null) {
+      final msg = isAr
+          ? 'الكود غير موجود أو غير متاح'
+          : 'Coupon code not found or unavailable';
+      setState(() => _codeError = msg);
+      _shakeCtrl.forward(from: 0);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: colors.danger,
+          content: Text(msg),
+        ),
+      );
+      return;
+    }
+    setState(() => _codeError = null);
+    _showCouponCelebrationDialog(context, match, isAr, colors);
+  }
+
+  void _showCouponCelebrationDialog(
+    BuildContext context,
+    CouponModel coupon,
+    bool isAr,
+    AppColorsExtension colors,
+  ) {
+    final discountLabel = coupon.type == CouponType.percent
+        ? '${coupon.value.toInt()}% ${isAr ? 'خصم' : 'OFF'}'
+        : '${coupon.value.toInt()} ${isAr ? 'ج.م خصم' : 'EGP OFF'}';
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.xl),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 84,
+                    height: 84,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          colors.success.withOpacity(0.22),
+                          colors.accent.withOpacity(0.18),
+                        ],
+                      ),
+                    ),
+                  )
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .scale(
+                        begin: const Offset(0.95, 0.95),
+                        end: const Offset(1.08, 1.08),
+                        duration: 900.ms,
+                      ),
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.success,
+                    ),
+                    child: Icon(
+                      PhosphorIcons.confetti(PhosphorIconsStyle.fill),
+                      size: 32,
+                      color: Colors.white,
+                    ),
+                  )
+                      .animate()
+                      .scale(
+                        begin: const Offset(0.3, 0.3),
+                        end: const Offset(1, 1),
+                        duration: 420.ms,
+                        curve: Curves.elasticOut,
+                      )
+                      .shake(hz: 3, duration: 380.ms),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                isAr ? 'مبروك! الكود صالح' : 'Hooray! Coupon Unlocked',
+                textAlign: TextAlign.center,
+                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colors.success,
+                    ),
+              ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, end: 0),
+              const SizedBox(height: 6),
+              Text(
+                isAr
+                    ? 'تهانينا! يمكنك استخدام هذا الكود الآن عند إتمام الطلب.'
+                    : 'Congratulations! Your discount is ready to use at checkout.',
+                textAlign: TextAlign.center,
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                      color: colors.mutedForeground,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm + 4,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(AppRadii.lg),
+                  border: Border.all(
+                    color: colors.primary.withOpacity(0.35),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      discountLabel,
+                      style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    AppBadge(
+                      label: coupon.code,
+                      tone: AppBadgeTone.accent,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      coupon.condition(isAr),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                            color: colors.mutedForeground,
+                          ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 180.ms).scale(
+                    begin: const Offset(0.92, 0.92),
+                    end: const Offset(1, 1),
+                    duration: 300.ms,
+                  ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppSecondaryButton(
+                      label: isAr ? 'حسناً' : 'Awesome',
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: AppPrimaryButton(
+                      label: isAr ? 'للسلة الآن' : 'Use in Cart',
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        context.push('/cart');
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -49,40 +245,46 @@ class _CouponsTabState extends ConsumerState<CouponsTab> {
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [
             // Add / Test Coupon Code
-            Row(
-              children: [
-                Expanded(
-                  child: AppTextField(
-                    controller: _codeCtrl,
-                    hint: isAr
-                        ? 'أدخل كود مثل WELCOME10 أو FISH20'
-                        : 'Try WELCOME10 or FISH20',
-                    prefixIcon: PhosphorIcons.tag(),
+            AnimatedBuilder(
+              animation: _shakeCtrl,
+              builder: (context, child) {
+                final dx = math.sin(_shakeCtrl.value * math.pi * 4) *
+                    8 *
+                    (1 - _shakeCtrl.value);
+                return Transform.translate(
+                  offset: Offset(dx, 0),
+                  child: child,
+                );
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _codeCtrl,
+                      hint: isAr
+                          ? 'أدخل كود مثل WELCOME10 أو FISH20'
+                          : 'Try WELCOME10 or FISH20',
+                      prefixIcon: PhosphorIcons.tag(),
+                      errorText: _codeError,
+                      onChanged: (_) {
+                        if (_codeError != null) {
+                          setState(() => _codeError = null);
+                        }
+                      },
+                      onSubmitted: (_) => _checkCoupon(isAr, colors),
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                AppSecondaryButton(
-                  label: isAr ? 'فحص' : 'Check',
-                  onPressed: () {
-                    final match = ref
-                        .read(couponsProvider.notifier)
-                        .findAvailableByCode(_codeCtrl.text);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          match != null
-                              ? (isAr
-                                  ? 'الكود ${match.code} متاح للاستخدام عند الدفع'
-                                  : 'Coupon ${match.code} is valid for checkout!')
-                              : (isAr
-                                  ? 'الكود غير موجود أو غير متاح'
-                                  : 'Coupon code not found or unavailable'),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                  const SizedBox(width: AppSpacing.sm),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: AppSecondaryButton(
+                      label: isAr ? 'فحص' : 'Check',
+                      onPressed: () => _checkCoupon(isAr, colors),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             // Stamp Card

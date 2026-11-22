@@ -102,7 +102,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsWidgets);
-      expect(find.text('Shop'), findsOneWidget);
+      expect(find.text('Shop'), findsWidgets);
       expect(find.text('Rewards'), findsOneWidget);
       expect(find.text('Reminders'), findsOneWidget);
       expect(find.text('Profile'), findsOneWidget);

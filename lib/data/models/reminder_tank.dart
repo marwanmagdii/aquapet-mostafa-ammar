@@ -19,6 +19,8 @@ class ReminderModel {
     required this.titleAr,
     required this.isEnabled,
     required this.createdAt,
+    this.descriptionEn,
+    this.descriptionAr,
     this.tankId,
     this.productId,
     this.bagGrams,
@@ -36,6 +38,8 @@ class ReminderModel {
   final ReminderType type;
   final String titleEn;
   final String titleAr;
+  final String? descriptionEn;
+  final String? descriptionAr;
   final bool isEnabled;
   final DateTime createdAt;
   final String? tankId;
@@ -53,6 +57,21 @@ class ReminderModel {
   final List<int> weekdays; // DateTime.monday(1)..DateTime.sunday(7)
 
   String title(bool isArabic) => isArabic ? titleAr : titleEn;
+
+  String? description(bool isArabic) {
+    final text = isArabic ? (descriptionAr ?? descriptionEn) : (descriptionEn ?? descriptionAr);
+    if (text == null || text.trim().isEmpty) return null;
+    return text.trim();
+  }
+
+  bool isFedTodayAt(DateTime now) {
+    if (type != ReminderType.feedingSchedule || lastCompletedAt == null) {
+      return false;
+    }
+    return lastCompletedAt!.year == now.year &&
+        lastCompletedAt!.month == now.month &&
+        lastCompletedAt!.day == now.day;
+  }
 
   /// Remaining days for food run-out, or days until next water/filter due.
   int daysLeftAt(DateTime now) {
@@ -90,6 +109,8 @@ class ReminderModel {
   ReminderModel copyWith({
     String? titleEn,
     String? titleAr,
+    String? descriptionEn,
+    String? descriptionAr,
     bool? isEnabled,
     DateTime? createdAt,
     String? tankId,
@@ -109,6 +130,8 @@ class ReminderModel {
       type: type,
       titleEn: titleEn ?? this.titleEn,
       titleAr: titleAr ?? this.titleAr,
+      descriptionEn: descriptionEn ?? this.descriptionEn,
+      descriptionAr: descriptionAr ?? this.descriptionAr,
       isEnabled: isEnabled ?? this.isEnabled,
       createdAt: createdAt ?? this.createdAt,
       tankId: tankId ?? this.tankId,
@@ -130,6 +153,8 @@ class ReminderModel {
         'type': type.name,
         'titleEn': titleEn,
         'titleAr': titleAr,
+        'descriptionEn': descriptionEn,
+        'descriptionAr': descriptionAr,
         'isEnabled': isEnabled,
         'createdAt': createdAt.toIso8601String(),
         'tankId': tankId,
@@ -150,6 +175,8 @@ class ReminderModel {
         type: ReminderType.values.byName(json['type'] as String),
         titleEn: json['titleEn'] as String,
         titleAr: json['titleAr'] as String,
+        descriptionEn: json['descriptionEn'] as String?,
+        descriptionAr: json['descriptionAr'] as String?,
         isEnabled: json['isEnabled'] as bool? ?? true,
         createdAt: DateTime.parse(json['createdAt'] as String),
         tankId: json['tankId'] as String?,

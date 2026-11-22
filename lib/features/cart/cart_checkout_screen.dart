@@ -11,6 +11,7 @@ import '../../data/models/coupon.dart';
 import '../../data/models/loyalty.dart';
 import '../../data/models/product.dart';
 import '../../data/repositories/app_providers.dart';
+import '../../shared/widgets/receipt_printer_dialog.dart';
 import '../../shared/widgets/shared_widgets.dart';
 
 class CartCheckoutScreen extends ConsumerStatefulWidget {
@@ -588,32 +589,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
     if (!mounted) return;
     setState(() => _placingOrder = false);
-    await showDialog<void>(
+    await ReceiptPrinterDialog.show(
       context: this.context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        icon: Icon(
-          PhosphorIcons.checkCircle(PhosphorIconsStyle.fill),
-          color: context.appColors.success,
-          size: 48,
-        ),
-        title: Text(isAr ? 'تم تأكيد طلبك!' : 'Order Placed!'),
-        content: Text(
-          isAr
-              ? 'رقم الطلب #$orderId\nاكتسبت +$pointsToEarn نقطة ولاء.'
-              : 'Order #$orderId confirmed.\nYou earned +$pointsToEarn loyalty points!',
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          AppPrimaryButton(
-            label: isAr ? 'متابعة الطلب' : 'Track Order',
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.go('/orders');
-            },
-          ),
-        ],
-      ),
+      order: order,
+      isAr: isAr,
+      onTrackOrder: () => context.go('/orders'),
     );
   }
 }

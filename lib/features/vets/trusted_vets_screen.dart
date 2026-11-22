@@ -89,25 +89,14 @@ class _VetCard extends StatelessWidget {
         .toList();
 
     return AppCard(
+      onTap: () => _openProfileSheet(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: colors.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(AppRadii.md),
-                ),
-                child: Icon(
-                  PhosphorIcons.stethoscope(),
-                  color: colors.primary,
-                  size: 24,
-                ),
-              ),
+              _VetAvatar(vet: vet, size: 64),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -115,7 +104,9 @@ class _VetCard extends StatelessWidget {
                   children: [
                     Text(
                       vet.name(isAr),
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -125,16 +116,20 @@ class _VetCard extends StatelessWidget {
                             color: colors.primary,
                           ),
                     ),
+                    const SizedBox(height: 4),
+                    AppBadge(
+                      icon: PhosphorIcons.sealCheck(PhosphorIconsStyle.fill),
+                      label: l10n.trustedByShopBadge,
+                      tone: AppBadgeTone.success,
+                    ),
                   ],
                 ),
               ),
+              Icon(
+                isAr ? PhosphorIcons.caretLeft() : PhosphorIcons.caretRight(),
+                color: colors.mutedForeground,
+              ),
             ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          AppBadge(
-            icon: PhosphorIcons.sealCheck(PhosphorIconsStyle.fill),
-            label: l10n.trustedByShopBadge,
-            tone: AppBadgeTone.success,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -198,11 +193,9 @@ class _VetCard extends StatelessWidget {
                     ),
                   ),
                 ...socials.map(
-                  (entry) => AppIconButton(
-                    icon: _socialIcon(entry.key),
-                    tooltip: entry.key,
-                    color: colors.primary,
-                    onPressed: () => _launch(context, entry.value.trim()),
+                  (entry) => _SocialBadgeButton(
+                    platform: entry.key,
+                    onTap: () => _launch(context, entry.value.trim()),
                   ),
                 ),
               ],
@@ -213,15 +206,127 @@ class _VetCard extends StatelessWidget {
     );
   }
 
-  IconData _socialIcon(String platform) {
-    return switch (platform.toLowerCase()) {
-      'facebook' => PhosphorIcons.facebookLogo(),
-      'instagram' => PhosphorIcons.instagramLogo(),
-      'tiktok' => PhosphorIcons.tiktokLogo(),
-      'youtube' => PhosphorIcons.youtubeLogo(),
-      'x' || 'twitter' => PhosphorIcons.xLogo(),
-      _ => PhosphorIcons.globe(),
-    };
+  void _openProfileSheet(BuildContext context) {
+    final colors = context.appColors;
+    final hasPhone = vet.phone != null && vet.phone!.trim().isNotEmpty;
+    final hasWhatsapp =
+        vet.whatsapp != null && vet.whatsapp!.trim().isNotEmpty;
+    final hasMap = vet.mapUrl != null && vet.mapUrl!.trim().isNotEmpty;
+    final socials = vet.socialLinks.entries
+        .where((e) => e.value.trim().isNotEmpty)
+        .toList();
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.xs,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _VetAvatar(vet: vet, size: 78),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vet.name(isAr),
+                          style: Theme.of(ctx).textTheme.titleLarge,
+                        ),
+                        Text(
+                          vet.clinic(isAr),
+                          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                                color: colors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 6),
+                        AppBadge(
+                          icon: PhosphorIcons.sealCheck(
+                            PhosphorIconsStyle.fill,
+                          ),
+                          label: l10n.trustedByShopBadge,
+                          tone: AppBadgeTone.success,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                vet.bio(isAr),
+                style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
+                      height: 1.5,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Icon(PhosphorIcons.stethoscope(), size: 18, color: colors.primary),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(vet.specialty(isAr))),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(PhosphorIcons.mapPin(), size: 18, color: colors.primary),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(vet.area(isAr))),
+                ],
+              ),
+              if (hasPhone || hasWhatsapp || hasMap || socials.isNotEmpty) ...[
+                const Divider(height: 24),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (hasPhone)
+                      FilledButton.icon(
+                        onPressed: () =>
+                            _launch(ctx, 'tel:${vet.phone!.trim()}'),
+                        icon: Icon(PhosphorIcons.phone(), size: 18),
+                        label: Text(l10n.vetCall),
+                      ),
+                    if (hasWhatsapp)
+                      OutlinedButton.icon(
+                        onPressed: () => _launch(ctx, vet.whatsapp!.trim()),
+                        icon: Icon(PhosphorIcons.whatsappLogo(), size: 18),
+                        label: Text(l10n.vetWhatsapp),
+                      ),
+                    if (hasMap)
+                      OutlinedButton.icon(
+                        onPressed: () => _launch(ctx, vet.mapUrl!.trim()),
+                        icon: Icon(PhosphorIcons.mapTrifold(), size: 18),
+                        label: Text(l10n.vetLocation),
+                      ),
+                    ...socials.map(
+                      (entry) => _SocialBadgeButton(
+                        platform: entry.key,
+                        onTap: () => _launch(ctx, entry.value.trim()),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _launch(BuildContext context, String rawUrl) async {
@@ -245,6 +350,91 @@ class _VetCard extends StatelessWidget {
   void _showLinkError(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.vetLinkError)),
+    );
+  }
+}
+
+class _VetAvatar extends StatelessWidget {
+  const _VetAvatar({required this.vet, required this.size});
+
+  final VetModel vet;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colors.primary.withOpacity(0.12),
+        border: Border.all(color: colors.primary.withOpacity(0.35), width: 2),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        vet.imageAsset,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Icon(
+          PhosphorIcons.stethoscope(),
+          color: colors.primary,
+          size: size * 0.45,
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialBadgeButton extends StatelessWidget {
+  const _SocialBadgeButton({
+    required this.platform,
+    required this.onTap,
+  });
+
+  final String platform;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final (IconData icon, Color color) = switch (platform.toLowerCase()) {
+      'facebook' => (
+          PhosphorIcons.facebookLogo(PhosphorIconsStyle.fill),
+          const Color(0xFF1877F2),
+        ),
+      'instagram' => (
+          PhosphorIcons.instagramLogo(PhosphorIconsStyle.fill),
+          const Color(0xFFE4405F),
+        ),
+      'tiktok' => (
+          PhosphorIcons.tiktokLogo(PhosphorIconsStyle.fill),
+          const Color(0xFF0F172A),
+        ),
+      'youtube' => (
+          PhosphorIcons.youtubeLogo(PhosphorIconsStyle.fill),
+          const Color(0xFFDC2626),
+        ),
+      'x' || 'twitter' => (
+          PhosphorIcons.xLogo(PhosphorIconsStyle.fill),
+          const Color(0xFF0F172A),
+        ),
+      _ => (PhosphorIcons.globe(), context.appColors.primary),
+    };
+
+    return Tooltip(
+      message: platform,
+      child: Material(
+        color: color.withOpacity(0.12),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: 48,
+            height: 48,
+            child: Icon(icon, color: color, size: 22),
+          ),
+        ),
+      ),
     );
   }
 }

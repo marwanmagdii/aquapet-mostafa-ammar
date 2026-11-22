@@ -83,29 +83,40 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(PhosphorIcons.package()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.package(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFF0284C7),
+                    ),
                     title: Text(isAr ? 'سجل الطلبات' : 'Order History'),
                     trailing: Icon(
                       isAr
                           ? PhosphorIcons.caretLeft()
                           : PhosphorIcons.caretRight(),
+                      textDirection: TextDirection.ltr,
                     ),
                     onTap: () => context.push('/orders'),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: Icon(PhosphorIcons.drop()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.drop(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFF0891B2),
+                    ),
                     title: Text(isAr ? 'أحواضي' : 'My Tanks'),
                     trailing: Icon(
                       isAr
                           ? PhosphorIcons.caretLeft()
                           : PhosphorIcons.caretRight(),
+                      textDirection: TextDirection.ltr,
                     ),
                     onTap: () => context.push('/tanks'),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: Icon(PhosphorIcons.stethoscope()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.stethoscope(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFF059669),
+                    ),
                     title: Text(AppLocalizations.of(context)!.trustedVetsTitle),
                     subtitle: Text(
                       AppLocalizations.of(context)!.trustedVetsSubtitle,
@@ -114,12 +125,16 @@ class ProfileScreen extends ConsumerWidget {
                       isAr
                           ? PhosphorIcons.caretLeft()
                           : PhosphorIcons.caretRight(),
+                      textDirection: TextDirection.ltr,
                     ),
                     onTap: () => context.push('/vets'),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: Icon(PhosphorIcons.bookOpenText()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.bookOpenText(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFF4F46E5),
+                    ),
                     title: Text(AppLocalizations.of(context)!.blogTitle),
                     subtitle: Text(
                       AppLocalizations.of(context)!.blogSubtitle,
@@ -128,17 +143,27 @@ class ProfileScreen extends ConsumerWidget {
                       isAr
                           ? PhosphorIcons.caretLeft()
                           : PhosphorIcons.caretRight(),
+                      textDirection: TextDirection.ltr,
                     ),
                     onTap: () => context.push('/blog'),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: Icon(PhosphorIcons.mapPin()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.mapPin(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFFEA580C),
+                    ),
                     title: Text(isAr ? 'دفتر العناوين' : 'Address Book'),
                     subtitle: Text(
                       user.addresses.isEmpty
                           ? (isAr ? 'لا توجد عناوين' : 'No saved addresses')
                           : '${user.addresses.first.area} — ${user.addresses.first.street}',
+                    ),
+                    trailing: Icon(
+                      isAr
+                          ? PhosphorIcons.caretLeft()
+                          : PhosphorIcons.caretRight(),
+                      textDirection: TextDirection.ltr,
                     ),
                     onTap: () =>
                         _openAddressSheet(context, ref, user, isAr),
@@ -154,7 +179,10 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(PhosphorIcons.translate()),
+                    leading: _ProfileIconBadge(
+                      icon: PhosphorIcons.translate(PhosphorIconsStyle.duotone),
+                      color: colors.primary,
+                    ),
                     title: Text(isAr ? 'اللغة' : 'Language'),
                     subtitle: Text(isAr ? 'العربية (RTL)' : 'English (LTR)'),
                     trailing: FilledButton.tonal(
@@ -165,7 +193,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const Divider(),
                   SwitchListTile(
-                    secondary: Icon(PhosphorIcons.moon()),
+                    secondary: _ProfileIconBadge(
+                      icon: PhosphorIcons.moon(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFF6366F1),
+                    ),
                     title: Text(isAr ? 'الوضع الداكن' : 'Dark Mode'),
                     value: isDark,
                     onChanged: (v) =>
@@ -173,7 +204,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const Divider(),
                   SwitchListTile(
-                    secondary: Icon(PhosphorIcons.bell()),
+                    secondary: _ProfileIconBadge(
+                      icon: PhosphorIcons.bell(PhosphorIconsStyle.duotone),
+                      color: const Color(0xFFEA580C),
+                    ),
                     title: Text(isAr ? 'إشعارات التذكير' : 'Notifications'),
                     value: user.notificationsEnabled,
                     onChanged: (v) =>
@@ -569,7 +603,12 @@ class _SocialLaunchButton extends StatelessWidget {
           child: SizedBox(
             width: 48,
             height: 48,
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(
+              icon,
+              color: color,
+              size: 24,
+              textDirection: TextDirection.ltr,
+            ),
           ),
         ),
       ),
@@ -650,6 +689,29 @@ class _CashierDemoScreenState extends ConsumerState<CashierDemoScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ProfileIconBadge extends StatelessWidget {
+  const _ProfileIconBadge({
+    required this.icon,
+    required this.color,
+  });
+
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.13),
+        borderRadius: BorderRadius.circular(AppRadii.md),
+      ),
+      child: Icon(icon, size: 20, color: color),
     );
   }
 }

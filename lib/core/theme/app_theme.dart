@@ -157,23 +157,60 @@ abstract final class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
-          borderSide: BorderSide(color: tokens.danger),
+          borderSide: BorderSide(color: tokens.danger, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadii.md),
+          borderSide: BorderSide(color: tokens.danger, width: 1.8),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: tokens.surface,
-        selectedColor: tokens.primary.withOpacity(0.14),
+        selectedColor: tokens.primary,
+        secondarySelectedColor: tokens.primary,
+        checkmarkColor: tokens.onPrimary,
         side: BorderSide(color: tokens.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.pill),
         ),
-        labelStyle: textTheme.labelMedium,
+        labelStyle: textTheme.labelMedium?.copyWith(
+          color: tokens.foreground,
+          fontWeight: FontWeight.w600,
+        ),
+        secondaryLabelStyle: textTheme.labelMedium?.copyWith(
+          color: tokens.onPrimary,
+          fontWeight: FontWeight.w700,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) return tokens.onPrimary;
+          return tokens.mutedForeground;
+        }),
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) return tokens.primary;
+          return tokens.muted;
+        }),
+        trackOutlineColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) return tokens.primary;
+          return tokens.border;
+        }),
       ),
       dividerTheme: DividerThemeData(
         color: tokens.border,
         thickness: 1,
         space: 1,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(AppRadii.sm),
+        ),
+        textStyle: textTheme.labelSmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       extensions: <ThemeExtension<dynamic>>[tokens],
     );

@@ -66,6 +66,7 @@ class RewardItem {
     required this.discountEgp,
     required this.isFreeItem,
     required this.imageAsset,
+    this.imageUrl,
     this.couponCodePrefix = 'RWD',
   });
 
@@ -78,6 +79,7 @@ class RewardItem {
   final double discountEgp;
   final bool isFreeItem;
   final String imageAsset;
+  final String? imageUrl;
   final String couponCodePrefix;
 
   String title(bool isArabic) => isArabic ? titleAr : titleEn;
