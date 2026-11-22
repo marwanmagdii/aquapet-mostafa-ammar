@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../core/tokens/app_tokens.dart';
 import '../../data/repositories/app_providers.dart';
+import 'web_splash_video.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key, this.nextRoute});
@@ -21,13 +23,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   VideoPlayerController? _controller;
   Timer? _fallbackTimer;
   bool _navigated = false;
+  Widget? _webVideo;
 
   @override
   void initState() {
     super.initState();
-    _initVideo();
-    // Safety fallback in case autoplay or video decoding is blocked.
-    _fallbackTimer = Timer(const Duration(seconds: 6), _goNext);
+    if (kIsWeb) {
+      _webVideo = buildWebSplashVideo(
+        assetPath: 'assets/videos/splash_intro.mp4',
+        onEnded: _goNext,
+        onError: () {
+          _fallbackTimer?.cancel();
+          _fallbackTimer = Timer(const Duration(milliseconds: 600), _goNext);
+        },
+      );
+      _fallbackTimer = Timer(const Duration(seconds: 10), _goNext);
+    } else {
+      _initVideo();
+      // Safety fallback in case autoplay or video decoding is blocked.
+      _fallbackTimer = Timer(const Duration(seconds: 6), _goNext);
+    }
   }
 
   Future<void> _initVideo() async {
@@ -86,7 +101,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          if (ready)
+          if (kIsWeb && _webVideo != null)
+            Positioned.fill(child: _webVideo!)
+          else if (ready)
             FittedBox(
               fit: BoxFit.cover,
               child: SizedBox(
