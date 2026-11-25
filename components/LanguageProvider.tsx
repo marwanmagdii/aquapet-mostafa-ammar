@@ -22,6 +22,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       if (saved === "ar" || saved === "en") {
         setLocaleState(saved);
       }
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          regs.forEach((reg) => reg.unregister());
+        });
+      }
     } catch {
       // Ignore storage access errors in restricted contexts
     }

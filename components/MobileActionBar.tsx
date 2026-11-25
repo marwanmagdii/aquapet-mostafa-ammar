@@ -30,7 +30,7 @@ export function MobileActionBar() {
         </button>
 
         <Link
-          href="/shop"
+          href="/shop/"
           className="flex-1 min-h-[48px] inline-flex items-center justify-center gap-2 rounded-full bg-ocean-yellow text-ocean-navy font-extrabold text-base active:scale-[0.97] transition-transform cursor-pointer shadow-sm"
         >
           <Store className="w-5 h-5 shrink-0" strokeWidth={1.75} aria-hidden="true" />

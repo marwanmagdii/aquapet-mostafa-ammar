@@ -173,7 +173,7 @@ export function Header() {
                     </div>
                   ))}
                   <Link
-                    href="/shop"
+                    href="/shop/"
                     className="block p-3 text-center text-sm font-extrabold text-ocean-primary bg-ocean-ice hover:bg-ocean-muted"
                   >
                     {locale === "ar" ? "عرض كل المنتجات في المتجر" : "View all in Store"}
@@ -211,7 +211,7 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <Link
-            href="/shop"
+            href="/shop/"
             className="hidden sm:inline-flex min-h-[48px] items-center gap-1.5 rounded-full bg-ocean-yellow [@media(hover:hover)]:hover:bg-ocean-yellow-hover text-ocean-navy font-extrabold text-sm sm:text-base px-4 transition-[background-color,transform] duration-200 active:scale-[0.97] cursor-pointer shadow-sm"
           >
             <Store className="w-4 h-4 shrink-0" strokeWidth={2} aria-hidden="true" />
@@ -309,7 +309,7 @@ export function Header() {
           </div>
           <nav className="flex flex-col gap-1.5" aria-label="Mobile navigation">
             <Link
-              href="/shop"
+              href="/shop/"
               onClick={() => setMenuOpen(false)}
               className="min-h-[48px] inline-flex items-center justify-center gap-2 rounded-full bg-ocean-yellow text-ocean-navy font-extrabold text-base px-5 cursor-pointer"
             >

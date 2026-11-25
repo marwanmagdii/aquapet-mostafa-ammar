@@ -53,7 +53,7 @@ export function ProductsSection() {
             )}
 
             <Link
-              href="/shop"
+              href="/shop/"
               className="min-h-[48px] inline-flex items-center gap-2 rounded-full bg-ocean-navy [@media(hover:hover)]:hover:bg-ocean-primary text-white font-extrabold text-base px-5 transition-colors cursor-pointer"
             >
               <Store className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
